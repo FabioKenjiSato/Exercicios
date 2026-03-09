@@ -15,9 +15,20 @@
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-4 md:p-8 pb-32">
 
+    <div id="barra-macros" class="fixed bottom-0 left-0 w-full bg-gray-950 border-t border-orange-500 p-4 z-50 shadow-2xl flex justify-between items-center px-6 md:px-12 hidden transition-all duration-500">
+        <div>
+            <p class="text-xs text-gray-400">Tempo Estimado:</p>
+            <p class="text-xl font-bold text-orange-400"><span id="total-tempo">0</span> <span class="text-sm">min</span></p>
+        </div>
+        <div class="text-right">
+            <p class="text-xs text-gray-400">Volume Total do Dia:</p>
+            <p class="text-xl font-bold text-green-400"><span id="total-series">0</span><span class="text-sm"> séries</span></p>
+        </div>
+    </div>
+
     <div class="max-w-md mx-auto">
         <h1 class="text-2xl font-bold text-orange-400 mb-1">Tracker de Treino</h1>
-        <p class="text-sm text-gray-400 mb-6">Ficha dividida por etapas do dia.</p>
+        <p class="text-sm text-gray-400 mb-6">Sua rotina completa adaptável com cálculo de volume.</p>
 
         <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-6 border-l-4 border-blue-500">
             <label class="block text-sm font-bold text-blue-400 mb-2">1. Selecione o Dia:</label>
@@ -39,9 +50,13 @@
             </label>
         </div>
 
-        <div id="area-print" class="bg-gray-800 rounded-xl shadow-lg p-6 border-t-4 border-orange-500 hidden relative">
+        <div id="area-print" class="bg-gray-800 rounded-xl shadow-lg p-6 border-t-4 border-orange-500 hidden relative mb-6">
             <h2 id="treino-titulo" class="text-xl font-bold text-orange-400 mb-1">...</h2>
-            <p id="treino-foco" class="text-xs text-gray-400 mb-6 font-bold">...</p>
+            <p id="treino-foco" class="text-xs text-gray-400 mb-4 font-bold">...</p>
+
+            <div id="treino-aviso" class="bg-gray-900 border border-yellow-500 text-yellow-400 text-xs p-3 rounded mb-5 hidden font-bold">
+                ...
+            </div>
 
             <ul id="treino-lista" class="space-y-3 text-sm">
                 </ul>
@@ -51,7 +66,7 @@
             </div>
         </div>
 
-        <div id="area-botao" class="hidden mt-6 transition-all duration-500 opacity-0 transform translate-y-4">
+        <div id="area-botao" class="hidden mt-6 mb-12 transition-all duration-500 opacity-0 transform translate-y-4">
             <button onclick="salvarImagem()" class="w-full bg-green-500 text-gray-900 font-extrabold py-4 rounded-lg shadow-lg hover:bg-green-400 transition flex justify-center items-center">
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 Dia Finalizado! Salvar Imagem
@@ -61,112 +76,122 @@
     </div>
 
     <script>
-        // =========================================================
-        // ⚙️ CONFIGURAÇÃO: QUAIS DIAS VOCÊ FAZ O SPACATE?
-        // Escreva os dias da semana abaixo (em minúsculo, sem acento)
+        // CONFIGURAÇÃO: Dias automáticos do Spacate
         const diasDeSpacate = ["quarta", "domingo"]; 
-        // =========================================================
 
-        // 1. Matinal (Sempre aparece)
+        // 1. Matinal (Sempre aparece) - [Séries pra somar, Minutos pra somar]
         const rotinaMatinal = [
-            { id: "mat1", nome: "Espreguiçar e Rotação de Pescoço", series: "1 minuto" },
-            { id: "mat2", nome: "Tocar a ponta dos pés (Cadeia Posterior)", series: "2x 30 segundos" },
-            { id: "mat3", nome: "Alongamento Panturrilha na parede", series: "2x 30 segundos" }
+            { id: "mat1", nome: "Espreguiçar e Rotação de Pescoço", series: "1 minuto", macroS: 0, macroT: 1 },
+            { id: "mat2", nome: "Tocar a ponta dos pés (Cadeia Posterior)", series: "2x 30 segundos", macroS: 2, macroT: 2 },
+            { id: "mat3", nome: "Alongamento Panturrilha na parede", series: "2x 30 segundos", macroS: 2, macroT: 2 }
         ];
 
-        // 2. Aquecimento Pré-Treino (Aparece nos dias de Academia e Core)
+        // 2. Aquecimento Pré-Treino
         const aquecimentoPadrao = [
-            { id: "aq1", nome: "Rotação de Ombros (Frente/Trás)", series: "2x 20 repetições" },
-            { id: "aq2", nome: "Rotação de Tronco", series: "2x 20 repetições" },
-            { id: "aq3", nome: "Agachamento Profundo sem peso", series: "2x 15 repetições" }
+            { id: "aq1", nome: "Rotação de Ombros (Frente/Trás)", series: "2x 20 repetições", macroS: 2, macroT: 2 },
+            { id: "aq2", nome: "Rotação de Tronco", series: "2x 20 repetições", macroS: 2, macroT: 2 },
+            { id: "aq3", nome: "Agachamento Profundo sem peso", series: "2x 15 repetições", macroS: 2, macroT: 3 }
         ];
 
         // 3. Treino de Spacate/Abertura
         const rotinaSpacate = [
-            { id: "spa1", nome: "Borboleta (Alongamento Virilha)", series: "Isometria 2 minutos" },
-            { id: "spa2", nome: "Posição do Sapo (Frog Stretch)", series: "Isometria 2 minutos" },
-            { id: "spa3", nome: "Abertura Frontal", series: "1 min cada perna" },
-            { id: "spa4", nome: "Abertura Lateral (Spacate)", series: "Máximo possível (2 min)" }
+            { id: "spa1", nome: "Borboleta (Alongamento Virilha)", series: "Isometria 2 minutos", macroS: 1, macroT: 2 },
+            { id: "spa2", nome: "Posição do Sapo (Frog Stretch)", series: "Isometria 2 minutos", macroS: 1, macroT: 2 },
+            { id: "spa3", nome: "Abertura Frontal", series: "1 min cada perna", macroS: 2, macroT: 3 },
+            { id: "spa4", nome: "Abertura Lateral (Spacate)", series: "Máximo possível (2 min)", macroS: 1, macroT: 2 }
         ];
 
-        // 4. Treinos de Musculação / Rotina
+        // 4. Treinos de Musculação com a matemática embutida
         const dbTreinos = {
             "segunda": {
                 titulo: "Segunda: Upper",
                 foco: "V-Taper e Costas.",
                 getExercicios: (pedal) => [
-                    { id: "seg1", nome: "Puxada Frontal Alta", series: "4x 10-12" },
-                    { id: "seg2", nome: "Remada Curvada com Halteres", series: "4x 10-12" },
-                    { id: "seg3", nome: "Supino Inclinado com Halteres", series: "4x 10-12" },
-                    { id: "seg4", nome: "Elevação Lateral", series: "4x 12-15" },
-                    { id: "seg5", nome: "Tríceps Pulley", series: "4x 12-15" }
-                ]
+                    { id: "seg1", nome: "Puxada Frontal Alta", series: "4x 10-12", macroS: 4, macroT: 10 },
+                    { id: "seg2", nome: "Remada Curvada com Halteres", series: "4x 10-12", macroS: 4, macroT: 10 },
+                    { id: "seg3", nome: "Supino Inclinado com Halteres", series: "4x 10-12", macroS: 4, macroT: 10 },
+                    { id: "seg4", nome: "Elevação Lateral", series: "4x 12-15", macroS: 4, macroT: 8 },
+                    { id: "seg5", nome: "Tríceps Pulley", series: "4x 12-15", macroS: 4, macroT: 8 }
+                ],
+                aviso: (pedal) => "" 
             },
             "terca": {
                 titulo: "Terça: Lower (Pernas Grossas)",
                 foco: "Foco pesado no quadríceps.",
                 getExercicios: (pedal) => {
-                    let seriesHack = pedal ? "4x 6-8 (Séries reduzidas pelo Pedal)" : "4x 6-8 (Carga Máxima!)";
-                    let seriesLeg = pedal ? "3x 8-12" : "3x 8-12 (Força)";
+                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "4x 6-8 (Carga Máxima!)";
+                    let macroHackS = pedal ? 3 : 4;
+                    let macroHackT = pedal ? 8 : 12; // Carga máxima exige mais descanso
+                    
+                    let seriesLeg = pedal ? "3x 8-12 (Carga Moderada)" : "4x 8-12 (Força)";
+                    let macroLegS = pedal ? 3 : 4;
+                    let macroLegT = pedal ? 8 : 12;
+
                     return [
-                        { id: "ter1", nome: "Agachamento Hack", series: seriesHack },
-                        { id: "ter2", nome: "Leg press", series: seriesLeg },
-                        { id: "ter3", nome: "Bulgarian split squat", series: "3x 8-10" },
-                        { id: "ter4", nome: "Stiff com halteres", series: "3x 8-12" },
-                        { id: "ter5", nome: "Panturrilha", series: "3x 12-15" }
+                        { id: "ter1", nome: "Agachamento Hack", series: seriesHack, macroS: macroHackS, macroT: macroHackT },
+                        { id: "ter2", nome: "Leg press", series: seriesLeg, macroS: macroLegS, macroT: macroLegT },
+                        { id: "ter3", nome: "Bulgarian split squat", series: "3x 8-10", macroS: 3, macroT: 10 },
+                        { id: "ter4", nome: "Stiff com halteres", series: "3x 8-12", macroS: 3, macroT: 8 },
+                        { id: "ter5", nome: "Panturrilha", series: "3x 12-15", macroS: 3, macroT: 6 }
                     ];
-                }
+                },
+                aviso: (pedal) => pedal ? "⚠️ Volume do Hack e Leg Press reduzido hoje para poupar as pernas do pedal!" : "🔥 Sem pedal hoje! Pode colocar carga máxima e descer tudo no Hack!"
             },
             "quarta": {
                 titulo: "Quarta: Core",
                 foco: "Tummy Toner (Em Casa).",
                 getExercicios: (pedal) => [
-                    { id: "qua1", nome: "Prancha Isométrica", series: "4x 1 minuto" },
-                    { id: "qua2", nome: "Hanging Leg Raises", series: "4x 12-15" },
-                    { id: "qua3", nome: "Abdominal Supra", series: "4x 15-20" },
-                    { id: "qua4", nome: "Vacuum", series: "5x 10 seg" }
-                ]
+                    { id: "qua1", nome: "Prancha Isométrica", series: "4x 1 minuto", macroS: 4, macroT: 6 },
+                    { id: "qua2", nome: "Hanging Leg Raises", series: "4x 12-15", macroS: 4, macroT: 8 },
+                    { id: "qua3", nome: "Abdominal Supra", series: "4x 15-20", macroS: 4, macroT: 6 },
+                    { id: "qua4", nome: "Vacuum", series: "5x 10 seg", macroS: 5, macroT: 3 }
+                ],
+                aviso: (pedal) => ""
             },
             "quinta": {
-                titulo: "Quinta: Só Pedal",
-                foco: "Dia fixo de pedal e recuperação.",
+                titulo: "Quinta: Dia do Pedal",
+                foco: "Sem Musculação.",
                 getExercicios: (pedal) => {
                     let ex = [];
-                    if(pedal) ex.push({ id: "qui1", nome: "Pedal Constante (8km+)", series: "Cardio do dia" });
+                    if(pedal) ex.push({ id: "qui1", nome: "Pedal Constante (8km+)", series: "Cardio do dia", macroS: 0, macroT: 40 });
                     return ex;
-                }
+                },
+                aviso: (pedal) => pedal ? "🚲 Hoje é só girar as pernas para faculdade/trabalho e recuperar o músculo." : ""
             },
             "sexta": {
                 titulo: "Sexta: Upper",
                 foco: "Costas, Ombros e Braços.",
                 getExercicios: (pedal) => {
                     let ex = [
-                        { id: "sex1", nome: "Barra Fixa / Graviton", series: "4x Até a falha" },
-                        { id: "sex2", nome: "Desenvolvimento Ombro", series: "4x 10-12" },
-                        { id: "sex3", nome: "Elevação Lateral", series: "4x 12-15" },
-                        { id: "sex4", nome: "Rosca Direta", series: "4x 10-12" }
+                        { id: "sex1", nome: "Barra Fixa / Graviton", series: "4x Até a falha", macroS: 4, macroT: 10 },
+                        { id: "sex2", nome: "Desenvolvimento Ombro", series: "4x 10-12", macroS: 4, macroT: 10 },
+                        { id: "sex3", nome: "Elevação Lateral", series: "4x 12-15", macroS: 4, macroT: 8 },
+                        { id: "sex4", nome: "Rosca Direta", series: "4x 10-12", macroS: 4, macroT: 8 }
                     ];
                     if(!pedal) {
-                        ex.push({ id: "sex5", nome: "Escada (20-25 min)", series: "Compensação de Cardio" });
+                        ex.push({ id: "sex5", nome: "Escada (Cardio de Compensação)", series: "20 a 25 min", macroS: 0, macroT: 25 });
                     }
                     return ex;
-                }
+                },
+                aviso: (pedal) => !pedal ? "⚠️ O sistema injetou Escada no final do treino porque você não andou de pedal hoje!" : "✅ O pedal já cobriu seu cardio diário. Faça só os ferros."
             },
             "sabado": {
                 titulo: "Sábado: Lower (Big Butt)",
                 foco: "Glúteo Foco.",
                 getExercicios: (pedal) => [
-                    { id: "sab1", nome: "Hip thrust", series: "4x 6-10" },
-                    { id: "sab2", nome: "Stiff", series: "3x 8-12" },
-                    { id: "sab3", nome: "Leg press pés altos", series: "3x 10-12" },
-                    { id: "sab4", nome: "Bulgarian leve", series: "3x 12" },
-                    { id: "sab5", nome: "Glute bridge isométrico", series: "Até a falha" }
-                ]
+                    { id: "sab1", nome: "Hip thrust", series: "4x 6-10", macroS: 4, macroT: 12 },
+                    { id: "sab2", nome: "Stiff", series: "3x 8-12", macroS: 3, macroT: 8 },
+                    { id: "sab3", nome: "Leg press pés altos", series: "3x 10-12", macroS: 3, macroT: 10 },
+                    { id: "sab4", nome: "Bulgarian leve", series: "3x 12", macroS: 3, macroT: 8 },
+                    { id: "sab5", nome: "Glute bridge isométrico", series: "Até a falha", macroS: 3, macroT: 5 }
+                ],
+                aviso: (pedal) => ""
             },
             "domingo": {
                 titulo: "Domingo: Apenas Alongamento",
                 foco: "Dia focado na mobilidade e descanso da musculação.",
-                getExercicios: (pedal) => [] // Fica vazio para a musculação
+                getExercicios: (pedal) => [],
+                aviso: (pedal) => "🧘 Dia sagrado do descanso da força. Destrave as pernas e a coluna."
             }
         };
 
@@ -176,47 +201,65 @@
             
             const areaPrint = document.getElementById('area-print');
             const areaBotao = document.getElementById('area-botao');
+            const barraMacros = document.getElementById('barra-macros');
             
             if(!dia) {
                 areaPrint.classList.add('hidden');
                 areaBotao.classList.add('hidden');
+                barraMacros.classList.add('hidden');
                 return;
             }
 
             const dados = dbTreinos[dia];
             const exerciciosForca = dados.getExercicios(pedal);
+            const avisoTexto = dados.aviso(pedal);
             const ehDiaDeSpacate = diasDeSpacate.includes(dia);
 
             document.getElementById('treino-titulo').innerText = dados.titulo;
             document.getElementById('treino-foco').innerText = dados.foco;
 
+            // Restaura o Alerta Amarelo do App Original
+            const avisoDiv = document.getElementById('treino-aviso');
+            if(avisoTexto !== "") {
+                avisoDiv.innerText = avisoTexto;
+                avisoDiv.classList.remove('hidden');
+            } else {
+                avisoDiv.classList.add('hidden');
+            }
+
             const lista = document.getElementById('treino-lista');
             lista.innerHTML = '';
+            
+            let varTotalSeries = 0;
+            let varTotalTempo = 0;
 
-            // 1. BLOCO: ALONGAMENTO MATINAL (Sempre presente)
+            // 1. BLOCO: ALONGAMENTO MATINAL
             lista.innerHTML += `<div class="text-yellow-400 font-bold mb-2 mt-2 text-xs uppercase tracking-wider">🌅 Alongamento Matinal</div>`;
             rotinaMatinal.forEach(ex => {
                 lista.innerHTML += criarItemCheckbox(ex);
+                varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
             });
 
-            // 2. BLOCO: AQUECIMENTO PRÉ-TREINO (Se não for domingo ou quinta)
+            // 2. BLOCO: AQUECIMENTO PRÉ-TREINO
             if(dia !== "domingo" && dia !== "quinta") {
                 lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">🏋️ Aquecimento Pré-Treino</div>`;
                 aquecimentoPadrao.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
+                    varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
                 });
             }
 
-            // 3. BLOCO: TREINO DO DIA (Musculação / Core / Pedal)
+            // 3. BLOCO: TREINO DO DIA
             if(exerciciosForca.length > 0) {
                 let tituloTreino = (dia === "quinta") ? "🚴 Cardio Diário" : "🔥 Treino de Força";
                 lista.innerHTML += `<div class="text-orange-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">${tituloTreino}</div>`;
                 exerciciosForca.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
+                    varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
                 });
             }
 
-            // 4. BLOCO: SPACATE (Ativado automaticamente pelos dias configurados)
+            // 4. BLOCO: SPACATE
             if(ehDiaDeSpacate) {
                 lista.innerHTML += `
                 <div class="bg-yellow-900 border-l-4 border-yellow-500 p-3 mt-8 mb-4 rounded shadow-md">
@@ -227,10 +270,16 @@
                 lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 text-xs uppercase tracking-wider">🤸 Treino de Spacate / Abertura</div>`;
                 rotinaSpacate.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
+                    varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
                 });
             }
 
+            // Atualiza Calculadora no Rodapé
+            document.getElementById('total-tempo').innerText = varTotalTempo;
+            document.getElementById('total-series').innerText = varTotalSeries;
+
             areaPrint.classList.remove('hidden');
+            barraMacros.classList.remove('hidden');
             areaBotao.classList.add('hidden', 'opacity-0', 'translate-y-4');
             
             verificarConclusao();
@@ -257,7 +306,6 @@
             } else {
                 textDiv.classList.remove('line-through', 'opacity-50');
             }
-
             verificarConclusao();
         }
 
