@@ -3,116 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de Treino - 65kg</title>
+    <title>Tracker de Treino - 65kg</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Estilização customizada para a caixinha de check */
+        input[type="checkbox"] {
+            accent-color: #f97316; /* Laranja Tailwind */
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-4 md:p-8 pb-12">
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-4 md:p-8 pb-32">
 
     <div class="max-w-md mx-auto">
-        
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-bold text-orange-500 mb-1">Ficha de Treino ABC</h1>
-            <p class="text-sm text-gray-400">Hipertrofia 6 dias na semana</p>
+        <h1 class="text-2xl font-bold text-orange-400 mb-1">Tracker de Treino</h1>
+        <p class="text-sm text-gray-400 mb-6">Marque os exercícios concluídos para salvar.</p>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-6 border-l-4 border-blue-500">
+            <label class="block text-sm font-bold text-blue-400 mb-2">1. Selecione o Dia:</label>
+            <select id="diaSemana" onchange="atualizarTreino()" class="w-full bg-gray-700 text-white rounded-lg p-3 mb-4 border border-gray-600 focus:outline-none focus:border-blue-500">
+                <option value="">Selecione...</option>
+                <option value="segunda">Segunda-feira (Upper)</option>
+                <option value="terca">Terça-feira (Lower - Pernas Grossas)</option>
+                <option value="quarta">Quarta-feira (Core em Casa)</option>
+                <option value="quinta">Quinta-feira (Descanso / Reunião)</option>
+                <option value="sexta">Sexta-feira (Upper)</option>
+                <option value="sabado">Sábado (Lower - Glúteo Foco)</option>
+            </select>
+
+            <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-blue-500 transition">
+                <input type="checkbox" id="temPedal" onchange="atualizarTreino()" class="w-6 h-6 rounded border-gray-400">
+                <span class="ml-3 text-sm font-bold text-blue-300">🚲 Fui/Vou de Pedal hoje (8km)</span>
+            </label>
         </div>
 
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-6 border-l-4 border-yellow-500">
-            <h2 class="text-xl font-bold text-yellow-400 mb-3">🔥 Pré-Treino (Fazer Todo Dia)</h2>
-            <p class="text-xs text-gray-400 mb-4">Nunca comece frio. Gaste 5 minutos aqui para evitar lesões e lubrificar as articulações.</p>
-            
-            <ul class="space-y-3 text-sm text-gray-300">
-                <li><span class="text-yellow-500 font-bold">1. Mobilidade Articular:</span> Rotação de ombros para frente e para trás (20x), rotação de tronco (20x).</li>
-                <li><span class="text-yellow-500 font-bold">2. Agachamento Livre (Sem peso):</span> 2 séries de 15 repetições descendo o máximo possível (abre o quadril).</li>
-                <li><span class="text-yellow-500 font-bold">3. Manguito Rotador:</span> 2 séries de 15 repetições (no elástico ou polia leve).</li>
-                <li><span class="text-yellow-500 font-bold">4. Aquecimento Específico:</span> No primeiro exercício do dia, faça 1 série de 15 repetições com apenas METADE da carga que você costuma usar.</li>
-            </ul>
+        <div id="area-print" class="bg-gray-800 rounded-xl shadow-lg p-6 border-t-4 border-orange-500 hidden relative">
+            <h2 id="treino-titulo" class="text-xl font-bold text-orange-400 mb-1">...</h2>
+            <p id="treino-foco" class="text-xs text-gray-400 mb-6 font-bold">...</p>
+
+            <ul id="treino-lista" class="space-y-4 text-sm">
+                </ul>
+
+            <div id="assinatura-imagem" class="hidden mt-8 text-center text-xs text-gray-500 border-t border-gray-700 pt-4">
+                Treino Concluído com Sucesso! | Meta: 65kg
+            </div>
         </div>
 
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-4 border-t-2 border-blue-500">
-            <h2 class="text-lg font-bold text-blue-400 mb-1">Segunda-feira: Treino A1</h2>
-            <p class="text-xs text-gray-500 font-bold mb-3">Peito, Ombro e Tríceps (Foco Força)</p>
-            
-            <ul class="space-y-2 text-sm text-gray-300">
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Supino Reto (Barra ou Halter)</span> <span class="text-orange-400 font-bold">4x 8 a 10</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Supino Inclinado (Halteres)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Crucifixo (Máquina ou Polia)</span> <span class="text-orange-400 font-bold">3x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Desenvolvimento (Halteres)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Elevação Lateral</span> <span class="text-orange-400 font-bold">4x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Tríceps Pulley (Corda)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between"><span>Tríceps Testa ou Frances</span> <span class="text-orange-400 font-bold">3x 12 a 15</span></li>
-            </ul>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-4 border-t-2 border-green-500">
-            <h2 class="text-lg font-bold text-green-400 mb-1">Terça-feira: Treino B1</h2>
-            <p class="text-xs text-gray-500 font-bold mb-3">Costas, Posterior de Ombro e Bíceps</p>
-            
-            <ul class="space-y-2 text-sm text-gray-300">
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Puxada Frontal Alta (Aberta)</span> <span class="text-orange-400 font-bold">4x 8 a 10</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Remada Curvada (Barra)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Remada Baixa (Triângulo)</span> <span class="text-orange-400 font-bold">3x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Crucifixo Inverso (Máquina/Halter)</span> <span class="text-orange-400 font-bold">4x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Rosca Direta (Barra W ou Reta)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between"><span>Rosca Martelo (Halteres)</span> <span class="text-orange-400 font-bold">3x 12 a 15</span></li>
-            </ul>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-4 border-t-2 border-red-500">
-            <h2 class="text-lg font-bold text-red-400 mb-1">Quarta-feira: Treino C1</h2>
-            <p class="text-xs text-gray-500 font-bold mb-3">Pernas Completas e Panturrilha</p>
-            
-            <ul class="space-y-2 text-sm text-gray-300">
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Agachamento Livre (Barra)</span> <span class="text-orange-400 font-bold">4x 8 a 10</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Leg Press 45º</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Cadeira Extensora (Isometria 2s)</span> <span class="text-orange-400 font-bold">4x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Cadeira Flexora</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between"><span>Panturrilha em Pé (Máquina/Degrau)</span> <span class="text-orange-400 font-bold">5x 15 a 20</span></li>
-            </ul>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-4 border-t-2 border-blue-500 opacity-90">
-            <h2 class="text-lg font-bold text-blue-400 mb-1">Quinta-feira: Treino A2</h2>
-            <p class="text-xs text-gray-500 font-bold mb-3">Peito, Ombro e Tríceps (Foco Volume)</p>
-            
-            <ul class="space-y-2 text-sm text-gray-300">
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Supino Reto (Máquina ou Halter)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Cross Over (Polia Alta)</span> <span class="text-orange-400 font-bold">4x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Elevação Lateral (Cabo ou Halter)</span> <span class="text-orange-400 font-bold">5x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Elevação Frontal</span> <span class="text-orange-400 font-bold">3x 12 a 15</span></li>
-                <li class="flex justify-between"><span>Tríceps Pulley (Barra V ou Reta)</span> <span class="text-orange-400 font-bold">4x 12 a 15</span></li>
-            </ul>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-4 border-t-2 border-green-500 opacity-90">
-            <h2 class="text-lg font-bold text-green-400 mb-1">Sexta-feira: Treino B2</h2>
-            <p class="text-xs text-gray-500 font-bold mb-3">Costas e Bíceps (Foco Expansão Dorsal)</p>
-            
-            <ul class="space-y-2 text-sm text-gray-300">
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Barra Fixa (ou Graviton)</span> <span class="text-orange-400 font-bold">4x Falha</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Remada Serrote (Halter - Unilateral)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Pulldown (Corda na Polia Alta)</span> <span class="text-orange-400 font-bold">4x 12 a 15</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Rosca Scott (Máquina ou Banco)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between"><span>Rosca Inversa (Polia ou Barra)</span> <span class="text-orange-400 font-bold">3x 12 a 15</span></li>
-            </ul>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-8 border-t-2 border-red-500 opacity-90">
-            <h2 class="text-lg font-bold text-red-400 mb-1">Sábado: Treino C2</h2>
-            <p class="text-xs text-gray-500 font-bold mb-3">Pernas (Foco Posterior e Glúteo)</p>
-            
-            <ul class="space-y-2 text-sm text-gray-300">
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Stiff (Barra ou Halter)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Mesa Flexora</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Elevação Pélvica (Barra)</span> <span class="text-orange-400 font-bold">4x 10 a 12</span></li>
-                <li class="flex justify-between border-b border-gray-700 pb-1"><span>Passada / Avanço (Halteres)</span> <span class="text-orange-400 font-bold">3x 12 Passos</span></li>
-                <li class="flex justify-between"><span>Panturrilha Sentado (Máquina)</span> <span class="text-orange-400 font-bold">5x 15 a 20</span></li>
-            </ul>
-        </div>
-
-        <div class="text-center text-gray-500 text-xs pb-4">
-            Domingo: Descanso Absoluto ou Cardio Leve.
+        <div id="area-botao" class="hidden mt-6 transition-all duration-500 opacity-0 transform translate-y-4">
+            <button onclick="salvarImagem()" class="w-full bg-green-500 text-gray-900 font-extrabold py-4 rounded-lg shadow-lg hover:bg-green-400 transition flex justify-center items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Treino Finalizado! Salvar Imagem
+            </button>
         </div>
 
     </div>
 
+    <script>
+        // BANCO DE DADOS DE TREINOS E ALONGAMENTO
+        const alongamentoPadrao = [
+            { id: "al1", nome: "Rotação de Ombros (Frente/Trás)", series: "2x 20 repetições" },
+            { id: "al2", nome: "Rotação de Tronco", series: "2x 20 repetições" },
+            { id: "al3", nome: "Agachamento Profundo sem peso", series: "2x 15 repetições" },
+            { id: "al4", nome: "Manguito Rotador", series: "2x 15 repetições" }
+            // Sem spacates!
+        ];
+
+        const dbTreinos = {
+            "segunda": {
+                titulo: "Segunda: Upper (V-Taper)",
+                foco: "Foco em alargar as costas e ombros.",
+                getExercicios: (pedal) => [
+                    { id: "seg1", nome: "Puxada Frontal Alta", series: "4x 10-12" },
+                    { id: "seg2", nome: "Remada Curvada com Halteres", series: "4x 10-12" },
+                    { id: "seg3", nome: "Supino Inclinado com Halteres", series: "4x 10-12" },
+                    { id: "seg4", nome: "Elevação Lateral (Ombros)", series: "4x 12-15" },
+                    { id: "seg5", nome: "Tríceps Pulley (Corda)", series: "4x 12-15" }
+                ]
+            },
+            "terca": {
+                titulo: "Terça: Lower (Pernas Grossas)",
+                foco: "Foco total no quadríceps.",
+                getExercicios: (pedal) => {
+                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada - Poupando do Pedal)" : "4x 6-8 (Carga Máxima!)";
+                    let seriesLeg = pedal ? "3x 10-12 (Carga Moderada)" : "4x 8-12 (Força)";
+                    return [
+                        { id: "ter1", nome: "Agachamento Hack", series: seriesHack },
+                        { id: "ter2", nome: "Leg Press 45º", series: seriesLeg },
+                        { id: "ter3", nome: "Bulgarian Split Squat", series: "3x 8-10" },
+                        { id: "ter4", nome: "Stiff com Halteres", series: "3x 8-12" },
+                        { id: "ter5", nome: "Panturrilha em Pé", series: "3x 12-15" }
+                    ];
+                }
+            },
+            "quarta": {
+                titulo: "Quarta: Core (Tummy Toner)",
+                foco: "Treino em Casa - Foco no abdômen slim.",
+                getExercicios: (pedal) => [
+                    { id: "qua1", nome: "Prancha Isométrica (Plank)", series: "4x 1 minuto" },
+                    { id: "qua2", nome: "Hanging Leg Raises (Elevação)", series: "4x 12-15" },
+                    { id: "qua3", nome: "Abdominal Supra Curto", series: "4x 15-20" },
+                    { id: "qua4", nome: "Vacuum Abdominal", series: "5x 10 seg" }
+                ]
+            },
+            "quinta": {
+                titulo: "Quinta: Descanso / Reunião",
+                foco: "Recuperação total muscular.",
+                getExercicios: (pedal) => {
+                    let ex = [{ id: "qui1", nome: "Descanso da Musculação", series: "Recuperação" }];
+                    if(pedal) ex.push({ id: "qui2", nome: "Pedal Constante (8km+)", series: "Cardio do dia" });
+                    return ex;
+                }
+            },
+            "sexta": {
+                titulo: "Sexta: Upper",
+                foco: "Costas, Ombros e Braços.",
+                getExercicios: (pedal) => {
+                    let ex = [
+                        { id: "sex1", nome: "Barra Fixa / Graviton", series: "4x Até a falha" },
+                        { id: "sex2", nome: "Desenvolvimento Ombro", series: "4x 10-12" },
+                        { id: "sex3", nome: "Elevação Lateral", series: "4x 12-15" },
+                        { id: "sex4", nome: "Rosca Direta (Bíceps)", series: "4x 10-12" }
+                    ];
+                    if(!pedal) {
+                        ex.push({ id: "sex5", nome: "Escada (Compensação por não pedalar)", series: "20 a 25 min" });
+                    }
+                    return ex;
+                }
+            },
+            "sabado": {
+                titulo: "Sábado: Lower (Big Butt)",
+                foco: "Glúteo Foco e Posterior da Coxa.",
+                getExercicios: (pedal) => [
+                    { id: "sab1", nome: "Hip Thrust (Elevação Pélvica)", series: "4x 6-10" },
+                    { id: "sab2", nome: "Stiff (Barra)", series: "3x 8-12" },
+                    { id: "sab3", nome: "Leg Press (Pés Altos)", series: "3x 10-12" },
+                    { id: "sab4", nome: "Bulgarian Leve", series: "3x 12" },
+                    { id: "sab5", nome: "Glute Bridge Isométrico", series: "Até a falha" }
+                ]
+            }
+        };
+
+        function atualizarTreino() {
+            const dia = document.getElementById('diaSemana').value;
+            const pedal = document.getElementById('temPedal').checked; // True se tiver marcado
+            const areaPrint = document.getElementById('area-print');
+            const areaBotao = document.getElementById('area-botao');
+            
+            if(!dia) {
+                areaPrint.classList.add('hidden');
+                areaBotao.classList.add('hidden');
+                return;
+            }
+
+            const dados = dbTreinos[dia];
+            const exercicios = dados.getExercicios(pedal);
+
+            document.getElementById('treino-titulo').innerText = dados.titulo;
+            document.getElementById('treino-foco').innerText = dados.foco;
+
+            const lista = document.getElementById('treino-lista');
+            lista.innerHTML = '';
+
+            // 1. Renderiza o Alongamento (Sempre presente, menos na quinta feira se não houver pedal)
+            if(dia !== "quinta") {
+                lista.innerHTML += `<div class="text-yellow-400 font-bold mb-2 mt-4 text-xs uppercase tracking-wider">Aquecimento e Mobilidade</div>`;
+                alongamentoPadrao.forEach(ex => {
+                    lista.innerHTML += criarItemCheckbox(ex);
+                });
+            }
+
+            // 2. Renderiza a Musculação
+            let tituloTreino = dia === "quinta" ? "Atividades de Hoje" : "Treino de Força";
+            lista.innerHTML += `<div class="text-orange-400 font-bold mb-2 mt-4 text-xs uppercase tracking-wider">${tituloTreino}</div>`;
+            exercicios.forEach(ex => {
+                lista.innerHTML += criarItemCheckbox(ex);
+            });
+
+            areaPrint.classList.remove('hidden');
+            
+            // Esconde o botão e verifica o status
+            areaBotao.classList.add('hidden', 'opacity-0', 'translate-y-4');
+            verificarConclusao();
+        }
+
+        // Função que cria o HTML do checkbox individual
+        function criarItemCheckbox(ex) {
+            return `
+                <li class="flex items-center bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-gray-500 transition">
+                    <input type="checkbox" id="check-${ex.id}" onchange="marcarConcluido('${ex.id}')" class="ex-checkbox w-6 h-6 rounded mr-4">
+                    <div id="text-${ex.id}" class="transition-all duration-300">
+                        <p class="text-gray-200 font-bold text-sm leading-tight">${ex.nome}</p>
+                        <p class="text-orange-400 font-semibold text-xs mt-1">${ex.series}</p>
+                    </div>
+                </li>
+            `;
+        }
+
+        // Função de estilo quando marca o checkbox (Rabisca o texto)
+        function marcarConcluido(id) {
+            const box = document.getElementById(`check-${id}`);
+            const textDiv = document.getElementById(`text-${id}`);
+
+            if(box.checked) {
+                textDiv.classList.add('line-through', 'opacity-50');
+            } else {
+                textDiv.classList.remove('line-through', 'opacity-50');
+            }
+
+            verificarConclusao();
+        }
+
+        // Função que checa se TODAS as caixinhas estão marcadas
+        function verificarConclusao() {
+            const checkboxes = document.querySelectorAll('.ex-checkbox');
+            const areaBotao = document.getElementById('area-botao');
+            
+            if(checkboxes.length === 0) return;
+
+            let todosMarcados = true;
+            checkboxes.forEach(box => {
+                if(!box.checked) todosMarcados = false;
+            });
+
+            if(todosMarcados) {
+                // Animação do botão subindo
+                areaBotao.classList.remove('hidden');
+                setTimeout(() => {
+                    areaBotao.classList.remove('opacity-0', 'translate-y-4');
+                }, 50);
+            } else {
+                areaBotao.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => {
+                    areaBotao.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function salvarImagem() {
+            const areaPrint = document.getElementById('area-print');
+            const assinatura = document.getElementById('assinatura-imagem');
+            
+            // Limpa as opacidades e riscos temporariamente para a foto ficar bonita
+            const divsTexto = document.querySelectorAll('[id^="text-"]');
+            divsTexto.forEach(div => div.classList.remove('line-through', 'opacity-50'));
+            
+            assinatura.classList.remove('hidden');
+
+            html2canvas(areaPrint, {
+                backgroundColor: "#1f2937",
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Treino-Concluido-${document.getElementById('diaSemana').value}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                assinatura.classList.add('hidden');
+                
+                // Volta os rabiscos depois de tirar a foto
+                divsTexto.forEach(div => div.classList.add('line-through', 'opacity-50'));
+            });
+        }
+    </script>
 </body>
 </html>
