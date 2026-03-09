@@ -17,7 +17,7 @@
 
     <div class="max-w-md mx-auto">
         <h1 class="text-2xl font-bold text-orange-400 mb-1">Tracker de Treino</h1>
-        <p class="text-sm text-gray-400 mb-6">Sua rotina completa adaptável.</p>
+        <p class="text-sm text-gray-400 mb-6">Ficha dividida por etapas do dia.</p>
 
         <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-6 border-l-4 border-blue-500">
             <label class="block text-sm font-bold text-blue-400 mb-2">1. Selecione o Dia:</label>
@@ -68,22 +68,31 @@
     </div>
 
     <script>
-        // BANCOS DE DADOS DE ROTINAS
+        // BANCOS DE DADOS DETALHADOS
 
         // 1. Matinal (Sempre aparece)
         const rotinaMatinal = [
-            { id: "mat1", nome: "Alongamento Matinal", series: "Corpo Inteiro (5 min)" },
-            { id: "mat2", nome: "Aquecimento Leve", series: "1 série livre" }
+            { id: "mat1", nome: "Espreguiçar e Rotação de Pescoço", series: "1 minuto" },
+            { id: "mat2", nome: "Tocar a ponta dos pés (Cadeia Posterior)", series: "2x 30 segundos" },
+            { id: "mat3", nome: "Alongamento Panturrilha na parede", series: "2x 30 segundos" }
         ];
 
-        // 2. Spacate (Aparece se marcado ou se for domingo)
+        // 2. Aquecimento Pré-Treino (Aparece nos dias de Academia e Core)
+        const aquecimentoPadrao = [
+            { id: "aq1", nome: "Rotação de Ombros (Frente/Trás)", series: "2x 20 repetições" },
+            { id: "aq2", nome: "Rotação de Tronco", series: "2x 20 repetições" },
+            { id: "aq3", nome: "Agachamento Profundo sem peso", series: "2x 15 repetições" }
+        ];
+
+        // 3. Treino de Spacate/Abertura
         const rotinaSpacate = [
-            { id: "spa1", nome: "Borboleta (Alongamento Virilha)", series: "2 minutos" },
-            { id: "spa2", nome: "Abertura Frontal", series: "1 min cada perna" },
-            { id: "spa3", nome: "Abertura Lateral (Spacate)", series: "2 minutos" }
+            { id: "spa1", nome: "Borboleta (Alongamento Virilha)", series: "Isometria 2 minutos" },
+            { id: "spa2", nome: "Posição do Sapo (Frog Stretch)", series: "Isometria 2 minutos" },
+            { id: "spa3", nome: "Abertura Frontal", series: "1 min cada perna" },
+            { id: "spa4", nome: "Abertura Lateral (Spacate)", series: "Máximo possível (2 min)" }
         ];
 
-        // 3. Treinos de Musculação com os nomes exatos da sua ficha
+        // 4. Treinos de Musculação / Rotina
         const dbTreinos = {
             "segunda": {
                 titulo: "Segunda: Upper",
@@ -123,7 +132,7 @@
             },
             "quinta": {
                 titulo: "Quinta: Só Pedal",
-                foco: "Dia fixo de pedal (Sem academia).",
+                foco: "Dia fixo de pedal e recuperação.",
                 getExercicios: (pedal) => {
                     let ex = [];
                     if(pedal) ex.push({ id: "qui1", nome: "Pedal Constante (8km+)", series: "Cardio do dia" });
@@ -159,8 +168,8 @@
             },
             "domingo": {
                 titulo: "Domingo: Apenas Alongamento",
-                foco: "Dia focado na mobilidade e descanso.",
-                getExercicios: (pedal) => [] // Retorna vazio pois a academia está desligada
+                foco: "Dia focado na mobilidade.",
+                getExercicios: (pedal) => [] // Fica vazio para dar espaço total ao Spacate
             }
         };
 
@@ -187,26 +196,40 @@
             const lista = document.getElementById('treino-lista');
             lista.innerHTML = '';
 
-            // 1. BLOCO DE ALONGAMENTO (Sempre presente)
-            lista.innerHTML += `<div class="text-yellow-400 font-bold mb-2 mt-2 text-xs uppercase tracking-wider">Alongamento</div>`;
-            
-            // Adiciona Matinal
+            // 1. BLOCO: ALONGAMENTO MATINAL (Sempre presente)
+            lista.innerHTML += `<div class="text-yellow-400 font-bold mb-2 mt-2 text-xs uppercase tracking-wider">🌅 Alongamento Matinal</div>`;
             rotinaMatinal.forEach(ex => {
                 lista.innerHTML += criarItemCheckbox(ex);
             });
 
-            // Se for domingo OU se o checkbox de spacate estiver marcado, adiciona os de abertura
-            if(dia === "domingo" || spacate) {
-                rotinaSpacate.forEach(ex => {
+            // 2. BLOCO: AQUECIMENTO PRÉ-TREINO (Se não for dia de descanso ou alongamento puro)
+            if(dia !== "domingo" && dia !== "quinta") {
+                lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">🏋️ Aquecimento Pré-Treino</div>`;
+                aquecimentoPadrao.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
                 });
             }
 
-            // 2. BLOCO DE ACADEMIA (Se houver exercícios para o dia)
+            // 3. BLOCO: TREINO DO DIA (Musculação / Core / Pedal)
             if(exerciciosForca.length > 0) {
-                let tituloTreino = (dia === "quinta") ? "Cardio" : "Treino de Força";
+                let tituloTreino = (dia === "quinta") ? "🚴 Cardio Diário" : "🔥 Treino de Força";
                 lista.innerHTML += `<div class="text-orange-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">${tituloTreino}</div>`;
                 exerciciosForca.forEach(ex => {
+                    lista.innerHTML += criarItemCheckbox(ex);
+                });
+            }
+
+            // 4. BLOCO: SPACATE (Se for domingo ou checkbox marcado)
+            if(dia === "domingo" || spacate) {
+                // Barra de Lembrete destacada
+                lista.innerHTML += `
+                <div class="bg-yellow-900 border-l-4 border-yellow-500 p-3 mt-8 mb-4 rounded shadow-md">
+                    <p class="text-yellow-400 text-sm font-extrabold">📌 Lembrete!</p>
+                    <p class="text-yellow-200 text-xs">Hoje é dia de focar na abertura pélvica. Vá no seu limite sem forçar lesões.</p>
+                </div>
+                `;
+                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 text-xs uppercase tracking-wider">🤸 Treino de Spacate / Abertura</div>`;
+                rotinaSpacate.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
                 });
             }
@@ -214,13 +237,12 @@
             areaPrint.classList.remove('hidden');
             areaBotao.classList.add('hidden', 'opacity-0', 'translate-y-4');
             
-            // Verifica na mesma hora se tudo já está marcado (caso gere uma lista que já está checked, o que é raro, mas garante a lógica)
             verificarConclusao();
         }
 
         function criarItemCheckbox(ex) {
             return `
-                <li class="flex items-center bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-gray-500 transition">
+                <li class="flex items-center bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-gray-500 transition shadow-sm">
                     <input type="checkbox" id="check-${ex.id}" onchange="marcarConcluido('${ex.id}')" class="ex-checkbox w-6 h-6 rounded mr-4">
                     <div id="text-${ex.id}" class="transition-all duration-300">
                         <p class="text-gray-200 font-bold text-sm leading-tight">${ex.nome}</p>
