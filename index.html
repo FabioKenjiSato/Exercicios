@@ -32,18 +32,11 @@
                 <option value="domingo">Domingo (Dia de Spacate / Alongamento)</option>
             </select>
 
-            <label class="block text-sm font-bold text-blue-400 mb-2">2. Adicionais do Dia:</label>
-            <div class="space-y-3">
-                <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-blue-500 transition">
-                    <input type="checkbox" id="temPedal" onchange="atualizarTreino()" class="w-6 h-6 rounded border-gray-400">
-                    <span class="ml-3 text-sm font-bold text-blue-300">🚲 Com Pedal hoje (8km)</span>
-                </label>
-
-                <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-yellow-500 transition">
-                    <input type="checkbox" id="temSpacate" onchange="atualizarTreino()" class="w-6 h-6 rounded border-gray-400">
-                    <span class="ml-3 text-sm font-bold text-yellow-300">🤸 Fazer Spacate / Abertura hoje</span>
-                </label>
-            </div>
+            <label class="block text-sm font-bold text-blue-400 mb-2">2. Cardio do Dia:</label>
+            <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-blue-500 transition">
+                <input type="checkbox" id="temPedal" onchange="atualizarTreino()" class="w-6 h-6 rounded border-gray-400">
+                <span class="ml-3 text-sm font-bold text-blue-300">🚲 Com Pedal hoje (8km)</span>
+            </label>
         </div>
 
         <div id="area-print" class="bg-gray-800 rounded-xl shadow-lg p-6 border-t-4 border-orange-500 hidden relative">
@@ -68,7 +61,11 @@
     </div>
 
     <script>
-        // BANCOS DE DADOS DETALHADOS
+        // =========================================================
+        // ⚙️ CONFIGURAÇÃO: QUAIS DIAS VOCÊ FAZ O SPACATE?
+        // Escreva os dias da semana abaixo (em minúsculo, sem acento)
+        const diasDeSpacate = ["quarta", "domingo"]; 
+        // =========================================================
 
         // 1. Matinal (Sempre aparece)
         const rotinaMatinal = [
@@ -168,15 +165,14 @@
             },
             "domingo": {
                 titulo: "Domingo: Apenas Alongamento",
-                foco: "Dia focado na mobilidade.",
-                getExercicios: (pedal) => [] // Fica vazio para dar espaço total ao Spacate
+                foco: "Dia focado na mobilidade e descanso da musculação.",
+                getExercicios: (pedal) => [] // Fica vazio para a musculação
             }
         };
 
         function atualizarTreino() {
             const dia = document.getElementById('diaSemana').value;
             const pedal = document.getElementById('temPedal').checked;
-            const spacate = document.getElementById('temSpacate').checked;
             
             const areaPrint = document.getElementById('area-print');
             const areaBotao = document.getElementById('area-botao');
@@ -189,6 +185,7 @@
 
             const dados = dbTreinos[dia];
             const exerciciosForca = dados.getExercicios(pedal);
+            const ehDiaDeSpacate = diasDeSpacate.includes(dia);
 
             document.getElementById('treino-titulo').innerText = dados.titulo;
             document.getElementById('treino-foco').innerText = dados.foco;
@@ -202,7 +199,7 @@
                 lista.innerHTML += criarItemCheckbox(ex);
             });
 
-            // 2. BLOCO: AQUECIMENTO PRÉ-TREINO (Se não for dia de descanso ou alongamento puro)
+            // 2. BLOCO: AQUECIMENTO PRÉ-TREINO (Se não for domingo ou quinta)
             if(dia !== "domingo" && dia !== "quinta") {
                 lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">🏋️ Aquecimento Pré-Treino</div>`;
                 aquecimentoPadrao.forEach(ex => {
@@ -219,9 +216,8 @@
                 });
             }
 
-            // 4. BLOCO: SPACATE (Se for domingo ou checkbox marcado)
-            if(dia === "domingo" || spacate) {
-                // Barra de Lembrete destacada
+            // 4. BLOCO: SPACATE (Ativado automaticamente pelos dias configurados)
+            if(ehDiaDeSpacate) {
                 lista.innerHTML += `
                 <div class="bg-yellow-900 border-l-4 border-yellow-500 p-3 mt-8 mb-4 rounded shadow-md">
                     <p class="text-yellow-400 text-sm font-extrabold">📌 Lembrete!</p>
