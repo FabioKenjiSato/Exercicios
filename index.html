@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker de Treino - 65kg</title>
+    <title>Tracker de Treino</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -39,7 +39,7 @@
                 <option value="quinta">Quinta-feira (Core em Casa - Reunião)</option>
                 <option value="sexta">Sexta-feira (Upper + Core)</option>
                 <option value="sabado">Sábado (Lower)</option>
-                <option value="domingo">Domingo (Apenas Alongamento)</option>
+                <option value="domingo">Domingo (Alongamento e Abertura)</option>
             </select>
 
             <label class="block text-sm font-bold text-blue-400 mb-2">2. Cardio de Rota:</label>
@@ -51,10 +51,6 @@
 
         <div id="area-print" class="bg-gray-800 rounded-xl shadow-lg p-6 border-t-4 border-orange-500 hidden relative mb-6">
             <h2 id="treino-titulo" class="text-xl font-bold text-orange-400 mb-4">...</h2>
-
-            <div id="treino-aviso" class="bg-gray-900 border border-yellow-500 text-yellow-400 text-xs p-3 rounded mb-5 hidden font-bold">
-                ...
-            </div>
 
             <ul id="treino-lista" class="space-y-3 text-sm">
                 </ul>
@@ -96,7 +92,7 @@
 
         const dbTreinos = {
             "segunda": {
-                titulo: "Segunda: Upper + Core",
+                titulo: "Segunda-feira: Upper + Core",
                 getExercicios: (pedal) => [
                     { id: "seg1", nome: "Desenvolvimento com Halteres", series: "3x 10-12", macroS: 4, macroT: 10 },
                     { id: "seg2", nome: "Puxada Frontal Alta", series: "3x 10-12", macroS: 4, macroT: 10 },
@@ -105,13 +101,12 @@
                     { id: "seg5", nome: "Deltoide Posterior", series: "3x 12-15", macroS: 4, macroT: 8 },
                     { id: "seg6", nome: "Hanging Leg Raises", series: "4x 15-20", macroS: 3, macroT: 6 },
                     { id: "seg7", nome: "Prancha Isométrica (Plank)", series: "3x 1 min", macroS: 3, macroT: 5 }
-                ],
-                aviso: (pedal) => "" 
+                ]
             },
             "terca": {
-                titulo: "Terça: Lower",
+                titulo: "Terça-feira: Lower",
                 getExercicios: (pedal) => {
-                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "3x 8-12 (Carga Máxima!)";
+                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "3x 8-12 (Carga Máxima)";
                     let macroHackS = pedal ? 3 : 4;
                     let macroHackT = pedal ? 8 : 12; 
                     
@@ -127,35 +122,32 @@
                         { id: "ter5", nome: "Stiff com Halteres", series: "3x 8-12", macroS: 3, macroT: 8 },
                         { id: "ter6", nome: "Panturrilha em Pé", series: "3x 12-15", macroS: 3, macroT: 6 }
                     ];
-                },
-                aviso: (pedal) => pedal ? "Volume de pernas reduzido (Compensação do Pedal)." : "Carga máxima permitida."
+                }
             },
             "quarta": {
-                titulo: "Quarta: Cardio na Academia",
+                titulo: "Quarta-feira: Cardio",
                 getExercicios: (pedal) => {
                     if(pedal) {
                         return [{ id: "qua1", nome: "Pedal Constante (16km+)", series: "Cardio do dia", macroS: 0, macroT: 40 }];
                     } else {
                         return [
-                            { id: "qua1", nome: "Escada (Pace Constante)", series: "30 a 40 min", macroS: 0, macroT: 35 }
+                            { id: "qua1", nome: "Escada (Pace Constante)", series: "40 min", macroS: 0, macroT: 40 }
                         ];
                     }
-                },
-                aviso: (pedal) => pedal ? "O pedal na rua substituiu o cardio indoor." : ""
+                }
             },
             "quinta": {
-                titulo: "Quinta: Core em Casa",
+                titulo: "Quinta-feira: Core em Casa",
                 getExercicios: (pedal) => [
                     { id: "qui1", nome: "Prancha Isométrica (Plank)", series: "4x 1 minuto", macroS: 4, macroT: 6 },
                     { id: "qui2", nome: "Prancha com Toque nos Ombros", series: "3x 20 toques", macroS: 3, macroT: 5 },
                     { id: "qui3", nome: "Reverse Crunch (Abdominal Inverso)", series: "4x 15-20", macroS: 4, macroT: 6 },
                     { id: "qui4", nome: "Bicycle Crunch (Bicicleta)", series: "4x 20 reps", macroS: 4, macroT: 6 },
                     { id: "qui5", nome: "Vacuum Abdominal", series: "5x 10 seg", macroS: 5, macroT: 3 }
-                ],
-                aviso: (pedal) => "Dia de reunião. Treino feito em casa."
+                ]
             },
             "sexta": {
-                titulo: "Sexta: Upper + Core",
+                titulo: "Sexta-feira: Upper + Core",
                 getExercicios: (pedal) => {
                     let ex = [
                         { id: "sex1", nome: "Supino Reto (Barra ou Halter)", series: "4x 10-12", macroS: 4, macroT: 10 },
@@ -165,11 +157,10 @@
                         { id: "sex5", nome: "Hanging Leg Raises", series: "3x 15-20", macroS: 3, macroT: 6 }
                     ];
                     if(!pedal) {
-                        ex.push({ id: "sex6", nome: "Escada (Cardio de Compensação)", series: "20 a 25 min", macroS: 0, macroT: 25 });
+                        ex.push({ id: "sex6", nome: "Escada (Compensação)", series: "20 a 25 min", macroS: 0, macroT: 25 });
                     }
                     return ex;
-                },
-                aviso: (pedal) => !pedal ? "Escada adicionada como compensação do cardio." : ""
+                }
             },
             "sabado": {
                 titulo: "Sábado: Lower",
@@ -180,13 +171,11 @@
                     { id: "sab4", nome: "Cadeira Abdutora", series: "4x 12-15", macroS: 4, macroT: 8 },
                     { id: "sab5", nome: "Bulgarian Leve", series: "3x 12", macroS: 3, macroT: 8 },
                     { id: "sab6", nome: "Glute Bridge Isométrico", series: "Até a falha", macroS: 3, macroT: 5 }
-                ],
-                aviso: (pedal) => ""
+                ]
             },
             "domingo": {
-                titulo: "Domingo: Apenas Alongamento",
-                getExercicios: (pedal) => [],
-                aviso: (pedal) => ""
+                titulo: "Domingo: Alongamento",
+                getExercicios: (pedal) => []
             }
         };
 
@@ -207,18 +196,9 @@
 
             const dados = dbTreinos[dia];
             const exerciciosForca = dados.getExercicios(pedal);
-            const avisoTexto = dados.aviso(pedal);
             const ehDiaDeAbertura = diasDeAbertura.includes(dia);
 
             document.getElementById('treino-titulo').innerText = dados.titulo;
-
-            const avisoDiv = document.getElementById('treino-aviso');
-            if(avisoTexto !== "") {
-                avisoDiv.innerText = avisoTexto;
-                avisoDiv.classList.remove('hidden');
-            } else {
-                avisoDiv.classList.add('hidden');
-            }
 
             const lista = document.getElementById('treino-lista');
             lista.innerHTML = '';
@@ -232,7 +212,7 @@
                 varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
             });
 
-            if(dia !== "domingo" && dia !== "quinta") {
+            if(dia !== "domingo" && dia !== "quinta" && dia !== "quarta") {
                 lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Aquecimento Pré-Treino</div>`;
                 aquecimentoPadrao.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
@@ -241,7 +221,7 @@
             }
 
             if(exerciciosForca.length > 0) {
-                let tituloTreino = (dia === "quarta") ? "Cardio Diário" : "Treino do Dia";
+                let tituloTreino = (dia === "quarta") ? "Cardio" : "Treino Principal";
                 lista.innerHTML += `<div class="text-orange-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">${tituloTreino}</div>`;
                 exerciciosForca.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
