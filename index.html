@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker de Treino - 65kg</title>
+    <title>Tracker de Treino</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -36,7 +36,7 @@
                 <option value="segunda">Segunda-feira (Upper + Core)</option>
                 <option value="terca">Terça-feira (Lower)</option>
                 <option value="quarta">Quarta-feira (Dia do Pedal / Sem Academia)</option>
-                <option value="quinta">Quinta-feira (Core em Casa)</option>
+                <option value="quinta">Quinta-feira (Core em Casa - Reunião)</option>
                 <option value="sexta">Sexta-feira (Upper + Core)</option>
                 <option value="sabado">Sábado (Lower)</option>
                 <option value="domingo">Domingo (Alongamento)</option>
@@ -45,7 +45,7 @@
             <label class="block text-sm font-bold text-blue-400 mb-2">2. Cardio do Dia:</label>
             <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-blue-500 transition">
                 <input type="checkbox" id="temPedal" onchange="atualizarTreino()" class="w-6 h-6 rounded border-gray-400">
-                <span class="ml-3 text-sm font-bold text-blue-300">🚲 Com Pedal hoje (16km)</span>
+                <span class="ml-3 text-sm font-bold text-blue-300">Com Pedal hoje (16km)</span>
             </label>
         </div>
 
@@ -66,7 +66,6 @@
 
         <div id="area-botao" class="hidden mt-6 mb-12 transition-all duration-500 opacity-0 transform translate-y-4">
             <button onclick="salvarImagem()" class="w-full bg-green-500 text-gray-900 font-extrabold py-4 rounded-lg shadow-lg hover:bg-green-400 transition flex justify-center items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 Dia Finalizado! Salvar Imagem
             </button>
         </div>
@@ -112,7 +111,7 @@
             "terca": {
                 titulo: "Terça: Lower",
                 getExercicios: (pedal) => {
-                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "3x 8-12 (Carga Máxima!)";
+                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "3x 8-12 (Carga Máxima)";
                     let macroHackS = pedal ? 3 : 4;
                     let macroHackT = pedal ? 8 : 12; 
                     
@@ -129,7 +128,7 @@
                         { id: "ter6", nome: "Panturrilha em Pé", series: "3x 12-15", macroS: 3, macroT: 6 }
                     ];
                 },
-                aviso: (pedal) => pedal ? "⚠️ Volume do Hack e Leg Press reduzido" : "🔥 Carga máxima"
+                aviso: (pedal) => pedal ? "Volume do Hack e Leg Press reduzido." : "Carga máxima permitida."
             },
             "quarta": {
                 titulo: "Quarta: Dia do Pedal",
@@ -138,7 +137,7 @@
                     if(pedal) ex.push({ id: "qua1", nome: "Pedal Constante (16km+)", series: "Cardio do dia", macroS: 0, macroT: 40 });
                     return ex;
                 },
-                aviso: (pedal) => pedal ? "" : ""
+                aviso: (pedal) => ""
             },
             "quinta": {
                 titulo: "Quinta: Core",
@@ -166,7 +165,7 @@
                     }
                     return ex;
                 },
-                aviso: (pedal) => !pedal ? "⚠️ Escada adicionada como compensação do cardio." : "✅ O pedal já cobriu seu cardio diário."
+                aviso: (pedal) => !pedal ? "Escada adicionada como compensação do cardio." : ""
             },
             "sabado": {
                 titulo: "Sábado: Lower",
@@ -229,6 +228,7 @@
                 varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
             });
 
+            // Ocultar aquecimento padrão na Quarta (Só Pedal) e Domingo (Só alongamento)
             if(dia !== "domingo" && dia !== "quarta") {
                 lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Aquecimento Pré-Treino</div>`;
                 aquecimentoPadrao.forEach(ex => {
@@ -247,13 +247,7 @@
             }
 
             if(ehDiaDeSpacate) {
-                lista.innerHTML += `
-                <div class="bg-yellow-900 border-l-4 border-yellow-500 p-3 mt-8 mb-4 rounded shadow-md">
-                    <p class="text-yellow-400 text-sm font-extrabold">📌 Lembrete!</p>
-                    <p class="text-yellow-200 text-xs">Hoje é dia de focar na abertura pélvica. Vá no seu limite sem forçar lesões.</p>
-                </div>
-                `;
-                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 text-xs uppercase tracking-wider">Treino Alongamento</div>`;
+                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Spacate / Abertura</div>`;
                 rotinaSpacate.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
                     varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
