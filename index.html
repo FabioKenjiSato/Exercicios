@@ -35,14 +35,14 @@
                 <option value="">Selecione...</option>
                 <option value="segunda">Segunda-feira (Upper + Core)</option>
                 <option value="terca">Terça-feira (Lower)</option>
-                <option value="quarta">Quarta-feira (Dia do Pedal / Sem Academia)</option>
+                <option value="quarta">Quarta-feira (Cardio na Academia)</option>
                 <option value="quinta">Quinta-feira (Core em Casa - Reunião)</option>
                 <option value="sexta">Sexta-feira (Upper + Core)</option>
                 <option value="sabado">Sábado (Lower)</option>
-                <option value="domingo">Domingo (Alongamento)</option>
+                <option value="domingo">Domingo (Alongamento e Spacate)</option>
             </select>
 
-            <label class="block text-sm font-bold text-blue-400 mb-2">2. Cardio do Dia:</label>
+            <label class="block text-sm font-bold text-blue-400 mb-2">2. Cardio de Rota:</label>
             <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-blue-500 transition">
                 <input type="checkbox" id="temPedal" onchange="atualizarTreino()" class="w-6 h-6 rounded border-gray-400">
                 <span class="ml-3 text-sm font-bold text-blue-300">Com Pedal hoje (16km)</span>
@@ -73,7 +73,7 @@
     </div>
 
     <script>
-        const diasDeSpacate = ["quinta", "domingo"];
+        const diasDeSpacate = ["quinta", "domingo"]; 
 
         const rotinaMatinal = [
             { id: "mat1", nome: "Espreguiçar e Rotação de Pescoço", series: "1 minuto", macroS: 0, macroT: 1 },
@@ -111,7 +111,7 @@
             "terca": {
                 titulo: "Terça: Lower",
                 getExercicios: (pedal) => {
-                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "3x 8-12 (Carga Máxima)";
+                    let seriesHack = pedal ? "3x 8-10 (Carga Moderada)" : "3x 8-12 (Carga Máxima!)";
                     let macroHackS = pedal ? 3 : 4;
                     let macroHackT = pedal ? 8 : 12; 
                     
@@ -128,19 +128,24 @@
                         { id: "ter6", nome: "Panturrilha em Pé", series: "3x 12-15", macroS: 3, macroT: 6 }
                     ];
                 },
-                aviso: (pedal) => pedal ? "Volume do Hack e Leg Press reduzido." : "Carga máxima permitida."
+                aviso: (pedal) => pedal ? "Volume de pernas reduzido (Compensação do Pedal)." : "Carga máxima permitida."
             },
             "quarta": {
-                titulo: "Quarta: Dia do Pedal",
+                titulo: "Quarta: Cardio na Academia",
                 getExercicios: (pedal) => {
-                    let ex = [];
-                    if(pedal) ex.push({ id: "qua1", nome: "Pedal Constante (16km+)", series: "Cardio do dia", macroS: 0, macroT: 40 });
-                    return ex;
+                    if(pedal) {
+                        return [{ id: "qua1", nome: "Pedal Constante (16km+)", series: "Cardio do dia", macroS: 0, macroT: 40 }];
+                    } else {
+                        return [
+                            { id: "qua1", nome: "Escada (Pace Constante)", series: "20 a 30 min", macroS: 0, macroT: 30 },
+                            { id: "qua2", nome: "Esteira Inclinada", series: "10 a 15 min", macroS: 0, macroT: 15 }
+                        ];
+                    }
                 },
-                aviso: (pedal) => ""
+                aviso: (pedal) => pedal ? "O pedal na rua substituiu o cardio indoor." : ""
             },
             "quinta": {
-                titulo: "Quinta: Core",
+                titulo: "Quinta: Core em Casa",
                 getExercicios: (pedal) => [
                     { id: "qui1", nome: "Prancha Isométrica (Plank)", series: "4x 1 minuto", macroS: 4, macroT: 6 },
                     { id: "qui2", nome: "Prancha com Toque nos Ombros", series: "3x 20 toques", macroS: 3, macroT: 5 },
@@ -148,7 +153,7 @@
                     { id: "qui4", nome: "Bicycle Crunch (Bicicleta)", series: "4x 20 reps", macroS: 4, macroT: 6 },
                     { id: "qui5", nome: "Vacuum Abdominal", series: "5x 10 seg", macroS: 5, macroT: 3 }
                 ],
-                aviso: (pedal) => ""
+                aviso: (pedal) => "Dia de reunião. Treino feito em casa."
             },
             "sexta": {
                 titulo: "Sexta: Upper + Core",
@@ -222,14 +227,15 @@
             let varTotalSeries = 0;
             let varTotalTempo = 0;
 
+            // ALONGAMENTO MATINAL
             lista.innerHTML += `<div class="text-yellow-400 font-bold mb-2 mt-2 text-xs uppercase tracking-wider">Alongamento Matinal</div>`;
             rotinaMatinal.forEach(ex => {
                 lista.innerHTML += criarItemCheckbox(ex);
                 varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
             });
 
-            // Ocultar aquecimento padrão na Quarta (Só Pedal) e Domingo (Só alongamento)
-            if(dia !== "domingo" && dia !== "quarta") {
+            // AQUECIMENTO PRÉ-TREINO (Oculto nos dias de casa/sem força bruta)
+            if(dia !== "domingo" && dia !== "quinta") {
                 lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Aquecimento Pré-Treino</div>`;
                 aquecimentoPadrao.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
@@ -237,6 +243,7 @@
                 });
             }
 
+            // TREINO PRINCIPAL
             if(exerciciosForca.length > 0) {
                 let tituloTreino = (dia === "quarta") ? "Cardio Diário" : "Treino do Dia";
                 lista.innerHTML += `<div class="text-orange-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">${tituloTreino}</div>`;
@@ -246,8 +253,9 @@
                 });
             }
 
+            // SPACATE
             if(ehDiaDeSpacate) {
-                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Spacate / Abertura</div>`;
+                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Treino de Abertura (Spacate)</div>`;
                 rotinaSpacate.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
                     varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
