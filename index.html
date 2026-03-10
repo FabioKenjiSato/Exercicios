@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker de Treino</title>
+    <title>Tracker de Treino - 65kg</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -39,7 +39,7 @@
                 <option value="quinta">Quinta-feira (Core em Casa - Reunião)</option>
                 <option value="sexta">Sexta-feira (Upper + Core)</option>
                 <option value="sabado">Sábado (Lower)</option>
-                <option value="domingo">Domingo (Alongamento e Spacate)</option>
+                <option value="domingo">Domingo (Apenas Alongamento)</option>
             </select>
 
             <label class="block text-sm font-bold text-blue-400 mb-2">2. Cardio de Rota:</label>
@@ -73,7 +73,7 @@
     </div>
 
     <script>
-        const diasDeSpacate = ["quinta", "domingo"]; 
+        const diasDeAbertura = ["quinta", "domingo"]; 
 
         const rotinaMatinal = [
             { id: "mat1", nome: "Espreguiçar e Rotação de Pescoço", series: "1 minuto", macroS: 0, macroT: 1 },
@@ -87,11 +87,11 @@
             { id: "aq3", nome: "Agachamento Profundo sem peso", series: "2x 15 repetições", macroS: 2, macroT: 3 }
         ];
 
-        const rotinaSpacate = [
+        const rotinaAbertura = [
             { id: "spa1", nome: "Borboleta (Alongamento Virilha)", series: "Isometria 2 minutos", macroS: 1, macroT: 2 },
             { id: "spa2", nome: "Posição do Sapo (Frog Stretch)", series: "Isometria 2 minutos", macroS: 1, macroT: 2 },
             { id: "spa3", nome: "Abertura Frontal", series: "1 min cada perna", macroS: 2, macroT: 3 },
-            { id: "spa4", nome: "Abertura Lateral (Spacate)", series: "Máximo possível (2 min)", macroS: 1, macroT: 2 }
+            { id: "spa4", nome: "Abertura Lateral", series: "Máximo possível (2 min)", macroS: 1, macroT: 2 }
         ];
 
         const dbTreinos = {
@@ -137,8 +137,7 @@
                         return [{ id: "qua1", nome: "Pedal Constante (16km+)", series: "Cardio do dia", macroS: 0, macroT: 40 }];
                     } else {
                         return [
-                            { id: "qua1", nome: "Escada (Pace Constante)", series: "20 a 30 min", macroS: 0, macroT: 30 },
-                            { id: "qua2", nome: "Esteira Inclinada", series: "10 a 15 min", macroS: 0, macroT: 15 }
+                            { id: "qua1", nome: "Escada (Pace Constante)", series: "30 a 40 min", macroS: 0, macroT: 35 }
                         ];
                     }
                 },
@@ -209,7 +208,7 @@
             const dados = dbTreinos[dia];
             const exerciciosForca = dados.getExercicios(pedal);
             const avisoTexto = dados.aviso(pedal);
-            const ehDiaDeSpacate = diasDeSpacate.includes(dia);
+            const ehDiaDeAbertura = diasDeAbertura.includes(dia);
 
             document.getElementById('treino-titulo').innerText = dados.titulo;
 
@@ -227,14 +226,12 @@
             let varTotalSeries = 0;
             let varTotalTempo = 0;
 
-            // ALONGAMENTO MATINAL
             lista.innerHTML += `<div class="text-yellow-400 font-bold mb-2 mt-2 text-xs uppercase tracking-wider">Alongamento Matinal</div>`;
             rotinaMatinal.forEach(ex => {
                 lista.innerHTML += criarItemCheckbox(ex);
                 varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
             });
 
-            // AQUECIMENTO PRÉ-TREINO (Oculto nos dias de casa/sem força bruta)
             if(dia !== "domingo" && dia !== "quinta") {
                 lista.innerHTML += `<div class="text-blue-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Aquecimento Pré-Treino</div>`;
                 aquecimentoPadrao.forEach(ex => {
@@ -243,7 +240,6 @@
                 });
             }
 
-            // TREINO PRINCIPAL
             if(exerciciosForca.length > 0) {
                 let tituloTreino = (dia === "quarta") ? "Cardio Diário" : "Treino do Dia";
                 lista.innerHTML += `<div class="text-orange-400 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">${tituloTreino}</div>`;
@@ -253,10 +249,9 @@
                 });
             }
 
-            // SPACATE
-            if(ehDiaDeSpacate) {
-                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Treino de Abertura (Spacate)</div>`;
-                rotinaSpacate.forEach(ex => {
+            if(ehDiaDeAbertura) {
+                lista.innerHTML += `<div class="text-yellow-500 font-bold mb-2 mt-6 text-xs uppercase tracking-wider">Treino de Abertura</div>`;
+                rotinaAbertura.forEach(ex => {
                     lista.innerHTML += criarItemCheckbox(ex);
                     varTotalSeries += ex.macroS; varTotalTempo += ex.macroT;
                 });
