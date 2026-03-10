@@ -27,7 +27,7 @@
     </div>
 
     <div class="max-w-md mx-auto">
-        <h1 class="text-2xl font-bold text-orange-400 mb-1">Tracker de Treino</h1>
+        <h1 class="text-2xl font-bold text-orange-400 mb-6">Tracker de Treino</h1>
 
         <div class="bg-gray-800 rounded-xl shadow-lg p-5 mb-6 border-l-4 border-blue-500">
             <label class="block text-sm font-bold text-blue-400 mb-2">1. Selecione o Dia:</label>
@@ -50,7 +50,7 @@
         </div>
 
         <div id="area-print" class="bg-gray-800 rounded-xl shadow-lg p-6 border-t-4 border-orange-500 hidden relative mb-6">
-            <h2 id="treino-titulo" class="text-xl font-bold text-orange-400 mb-1">...</h2>
+            <h2 id="treino-titulo" class="text-xl font-bold text-orange-400 mb-4">...</h2>
 
             <div id="treino-aviso" class="bg-gray-900 border border-yellow-500 text-yellow-400 text-xs p-3 rounded mb-5 hidden font-bold">
                 ...
@@ -74,7 +74,7 @@
     </div>
 
     <script>
-        const diasDeSpacate = ["quinta", "domingo"]; // Movido para quinta-feira (dia em casa)
+        const diasDeSpacate = ["quinta", "domingo"];
 
         const rotinaMatinal = [
             { id: "mat1", nome: "Espreguiçar e Rotação de Pescoço", series: "1 minuto", macroS: 0, macroT: 1 },
@@ -129,7 +129,7 @@
                         { id: "ter6", nome: "Panturrilha em Pé", series: "3x 12-15", macroS: 3, macroT: 6 }
                     ];
                 },
-                aviso: (pedal) => pedal ? "Volume do Hack e Leg Press reduzido" : "Carga máxima"
+                aviso: (pedal) => pedal ? "⚠️ Volume do Hack e Leg Press reduzido" : "🔥 Carga máxima"
             },
             "quarta": {
                 titulo: "Quarta: Dia do Pedal",
@@ -166,7 +166,7 @@
                     }
                     return ex;
                 },
-                aviso: (pedal) => !pedal ? ""
+                aviso: (pedal) => !pedal ? "⚠️ Escada adicionada como compensação do cardio." : "✅ O pedal já cobriu seu cardio diário."
             },
             "sabado": {
                 titulo: "Sábado: Lower",
